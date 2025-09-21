@@ -5,15 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Mukja – Cash‑Out (iPhone • Mini)</title>
+<title>Mukja – Cash‑Out (iPhone • Ultra • High Contrast)</title>
 <style>
   :root{
-    --bg:#f5f5f7; --surface:#ffffff; --ink:#0b0b0f; --muted:#6b7280; --line:#e5e7eb; --accent:#0a84ff;
-    --softBlue:#e6f1ff; --softRed:#feecec; --softGreen:#eaf7ed; --softAmber:#fff6e1; --softViolet:#efeafe;
+    --bg:#f5f5f7; --surface:#ffffff; --ink:#0b0b0f; --muted:#374151; --line:#e5e7eb; --accent:#0a84ff;
+    --red:#ef4444; --blue:#2563eb; --amber:#d97706; --green:#059669; --violet:#7c3aed;
   }
   @media (prefers-color-scheme: dark){
-    :root{ --bg:#0b0b10; --surface:#14161a; --ink:#e5e7eb; --muted:#a1a1aa; --line:#26272b; --accent:#0a84ff;
-      --softBlue:#0f1d33; --softRed:#2a1414; --softGreen:#0f2517; --softAmber:#2a2212; --softViolet:#1a1630; }
+    :root{ --bg:#0b0b10; --surface:#14161a; --ink:#f3f4f6; --muted:#a1a1aa; --line:#26272b; --accent:#0a84ff;
+      --red:#f87171; --blue:#60a5fa; --amber:#fbbf24; --green:#34d399; --violet:#a78bfa; }
   }
   *{box-sizing:border-box}
   body{ margin:0;background:var(--bg);color:var(--ink);
@@ -26,17 +26,13 @@
   .bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   .btn{appearance:none;background:var(--accent);color:#fff;border:0;border-radius:12px;padding:10px 14px;font-weight:800;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.12); min-height:44px}
   .btn.secondary{background:transparent;color:var(--accent);border:1px solid var(--accent)}
-  .chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:4px 8px;color:var(--muted);background:transparent;font-weight:700}
-  .tabs{display:flex;gap:6px;margin:6px 0 10px 0;flex-wrap:wrap}
-  .tab{padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:var(--surface);cursor:pointer;min-height:40px}
-  .tab[aria-selected="true"]{background:#e6f1ff;color:#0b0b0f;border-color:#b6d3ff}
   .grid{display:grid;grid-template-columns:1fr;gap:12px}
   .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
   .step{font-weight:900;margin:0 0 10px 0;display:flex;align-items:center;gap:8px}
   .dot{width:8px;height:8px;border-radius:999px;background:var(--accent)}
   label{display:block;font-weight:700;margin-bottom:6px}
   input[type="number"], input[type="date"], input[type="url"], input[type="text"], select{
-    width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--ink);accent-color:var(--accent); min-height:44px; font-size:17px;
+    width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:#fff;color:#000;accent-color:var(--accent); min-height:44px; font-size:17px;
   }
   select{appearance:none}
   @media (prefers-color-scheme: dark){
@@ -49,11 +45,12 @@
   .seg button{background:transparent;border:0;color:var(--muted);padding:8px 10px;font-weight:800;cursor:pointer; min-height:40px}
   .seg button.active{background:var(--surface);color:var(--ink)}
   .mono{font-variant-numeric:tabular-nums}
-  .action{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center;border-radius:14px;padding:12px;border:1px solid var(--line)}
-  .action .title{font-size:16px;font-weight:900;margin:0}
-  .action .amt{font-size:22px;font-weight:1000;display:flex;align-items:center;gap:8px}
+  .action{display:grid;grid-template-columns:10px 1fr auto;gap:12px;align-items:center;border-radius:14px;padding:12px;border:1px solid var(--line);background:var(--surface)}
+  .barL{width:10px;height:100%;border-radius:8px}
+  .action .title{font-size:17px;font-weight:900;margin:0}
+  .action .amt{font-size:24px;font-weight:1000;display:flex;align-items:center;gap:8px;color:var(--ink)}
   .copy{font-size:13px;padding:6px 8px;border-radius:10px;border:1px solid var(--line);background:transparent;cursor:pointer; min-height:36px}
-  .bank{background:var(--softRed)} .home{background:var(--softBlue)} .safe{background:var(--softAmber)} .ok{background:var(--softGreen)} .total{background:var(--softViolet)}
+  .bank .barL{background:var(--red)} .home .barL{background:var(--blue)} .safe .barL{background:var(--amber)} .ok .barL{background:var(--green)} .total .barL{background:var(--violet)}
   .kv{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line)}
   .kv:last-child{border-bottom:0}
   .small{font-size:12px;color:var(--muted)}
@@ -61,20 +58,20 @@
   .toast.show{opacity:1}
   .screenOnly{display:block}
   .printOnly{display:none}
+  .sheet{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:flex-end;z-index:50}
+  .panel{background:var(--surface);border-top-left-radius:16px;border-top-right-radius:16px;box-shadow:0 -6px 20px rgba(0,0,0,.25);padding:12px 14px;max-height:85vh;overflow:auto;border:1px solid var(--line);width:100%;max-width:720px;margin:0 auto}
+  .panel header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .close{background:transparent;border:1px solid var(--line);padding:6px 10px;border-radius:10px;font-weight:800;cursor:pointer}
   @media print{
     @page{size:auto; margin:0.5in}
     body{background:#fff;color:#000;font:12px/1.35 -apple-system,system-ui,Arial}
     .wrap{max-width:none;padding:0}
-    .screenOnly, .tabs, nav, .btn, .seg, .chip{display:none !important}
+    .screenOnly, .btn{display:none !important}
     .printOnly{display:block}
     .card{background:#fff;border-color:#ccc;box-shadow:none;page-break-inside:avoid}
     h1{font-size:18px}
     .kv{padding:6px 0}
   }
-  table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
-  thead th{background:#e6f1ff;color:#0b0b0f;padding:10px;text-align:left;font-weight:900}
-  tbody td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
-  tbody tr:last-child td{border-bottom:0}
 </style>
 </head>
 <body>
@@ -82,24 +79,18 @@
     <header class="screenOnly">
       <div>
         <h1>Mukja – Cash‑Out</h1>
-        <p class="sub">iPhone‑simple • Till auto‑locks at <strong>$200</strong>. Default: <span class="chip">Denomination totals</span>.</p>
+        
       </div>
       <div class="bar">
         <button class="btn" id="saveEntry">Save</button>
         <button class="btn secondary" id="btnPrint">Print</button>
+        <button class="btn secondary" id="btnHistory">History</button>
         <button class="btn secondary" id="btnSettings">Settings</button>
       </div>
     </header>
 
-    <nav class="tabs screenOnly" role="tablist">
-      <button class="tab" role="tab" id="tab-count" aria-selected="true" aria-controls="count">Count</button>
-      <button class="tab" role="tab" id="tab-history" aria-selected="false" aria-controls="history">History</button>
-      <button class="tab" role="tab" id="tab-settings" aria-selected="false" aria-controls="settings">Settings</button>
-    </nav>
-
-    <section id="count" aria-hidden="false" class="screenOnly">
+    <section id="count" class="screenOnly">
       <div class="grid">
-
         <div class="card">
           <p class="step"><span class="dot"></span> Count & Cash‑Outs</p>
           <div class="row"><label>Date</label><input id="date" type="date"></div>
@@ -118,12 +109,12 @@
           </div>
 
           <div id="billsDenomBox" style="margin-top:8px">
-            <div class="row"><label>Total in $100s</label><input id="amt100" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
-            <div class="row"><label>Total in $50s</label><input id="amt50" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
-            <div class="row"><label>Total in $20s</label><input id="amt20" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
-            <div class="row"><label>Total in $10s</label><input id="amt10" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
-            <div class="row"><label>Total in $5s</label><input id="amt5" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
-            <div class="row"><label>Total in $1s</label><input id="amt1" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
+            <div class="row"><label>Total in $100s</label><input id="amt100" type="number" step="100" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
+            <div class="row"><label>Total in $50s</label><input id="amt50" type="number" step="50" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
+            <div class="row"><label>Total in $20s</label><input id="amt20" type="number" step="20" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
+            <div class="row"><label>Total in $10s</label><input id="amt10" type="number" step="10" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
+            <div class="row"><label>Total in $5s</label><input id="amt5" type="number" step="5" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
+            <div class="row"><label>Total in $1s</label><input id="amt1" type="number" step="1" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
             <div class="kv"><span>Bills subtotal (denoms)</span><span class="mono" id="billsSub">$0.00</span></div>
           </div>
 
@@ -131,7 +122,7 @@
             <div class="row"><label>Bills total</label><input id="billsSingle" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
           </div>
 
-          <div class="row" style="margin-top:4px"><label>Coins counted</label><input id="coins" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
+          <div class="row" style="margin-top:4px"><label>Coins counted</label><input id="coins" type="number" min="0" step="0.01" inputmode="decimal" placeholder="e.g., 1579 or 15.79"></div>
           <div class="row"><label>Other Cash‑Outs</label><input id="voids" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
           <div class="small">Net cash = Bills + Coins − Other Cash‑Outs. Till ends at $200 automatically.</div>
 
@@ -142,31 +133,31 @@
           <p class="step"><span class="dot"></span> Do This (Automatic Plan)</p>
 
           <div id="actTotal" class="action total">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" width="28" height="28" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+            <div class="barL"></div>
             <div><div class="title">TOTAL CASH TO TAKE OUT</div><div class="small">Deposit + Other Cash‑Outs</div></div>
             <div class="amt mono"><span id="totalOut">$0.00</span><button class="copy" data-copy="totalOut">Copy</button></div>
           </div>
 
           <div id="actBank" class="action bank" style="margin-top:8px">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" width="28" height="28" aria-hidden="true"><path d="M3 10l9-6 9 6"></path><path d="M4 10h16v10H4z"></path><path d="M9 14h6v6H9z"></path></svg>
+            <div class="barL"></div>
             <div><div class="title">TAKE TO BANK (Deposit)</div><div class="small">Deposit (total)</div></div>
             <div class="amt mono"><span id="deposit">$0.00</span><button class="copy" data-copy="deposit">Copy</button></div>
           </div>
 
           <div id="actHome" class="action home" style="margin-top:8px">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" width="28" height="28" aria-hidden="true"><path d="M3 11l9-7 9 7"></path><path d="M5 10v10h14V10"></path><path d="M9 20v-6h6v6"></path></svg>
+            <div class="barL"></div>
             <div><div class="title">OTHER CASH‑OUTS</div><div class="small">Cash paid out today (payouts, petty cash)</div></div>
             <div class="amt mono"><span id="voidHome">$0.00</span><button class="copy" data-copy="voidHome">Copy</button></div>
           </div>
 
           <div id="actSafe" class="action safe" style="margin-top:8px; display:none">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" width="28" height="28" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><rect x="3" y="5" width="18" height="14" rx="2"></rect></svg>
+            <div class="barL"></div>
             <div><div class="title">PULL FROM SAFE</div><div class="small">Add this to reach $200</div></div>
             <div class="amt mono"><span id="shortAmt">$0.00</span><button class="copy" data-copy="shortAmt">Copy</button></div>
           </div>
 
           <div id="actOk" class="action ok" style="margin-top:8px; display:none">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" width="28" height="28" aria-hidden="true"><path d="M20 6L9 17l-5-5"></path></svg>
+            <div class="barL"></div>
             <div><div class="title">Till Will End at $200</div><div class="small">No safe adjustment needed</div></div>
             <div class="amt mono"><span id="leave">$200.00</span></div>
           </div>
@@ -177,7 +168,6 @@
           <div class="kv"><span>Bills in bank deposit</span><span class="mono" id="depBills">$0.00</span></div>
           <div id="posKv" class="kv" style="display:none"><span>Over/Short vs POS expected</span><span class="mono" id="posDelta">$0.00</span></div>
         </div>
-
       </div>
     </section>
 
@@ -201,53 +191,51 @@
         <div class="kv" id="p_posRow" style="display:none"><span>Over/Short vs POS expected</span><span class="mono" id="p_posDelta">$0.00</span></div>
       </div>
     </section>
+  </div>
 
-    <section id="history" aria-hidden="true" class="screenOnly">
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
-          <div style="font-weight:900;font-size:18px">History</div>
-          <div class="bar">
-            <button id="exportCsv" class="btn secondary">Export CSV</button>
-            <button id="exportJson" class="btn secondary">Export JSON</button>
-            <label class="btn secondary" for="importJson" style="cursor:pointer">Import JSON</label>
-            <input id="importJson" type="file" accept="application/json" style="display:none">
-            <button id="clear" class="btn secondary">Clear All</button>
-          </div>
-        </div>
-        <div class="small" style="margin-top:4px">Device‑local log. Export CSV/JSON to move or back up.</div>
-        <div style="margin-top:10px;overflow:auto">
-          <table id="tbl">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Staff</th>
-                <th>Total</th>
-                <th>Net</th>
-                <th>Deposit</th>
-                <th>Other Cash‑Outs</th>
-                <th>Short from Safe</th>
-                <th>Total Out</th>
-                <th>Over/Short vs POS</th>
-                <th class="small">Bills / Coins</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
+  <div class="sheet" id="sheetSettings" aria-hidden="true">
+    <div class="panel">
+      <header><div style="font-weight:900">Settings</div><button class="close" data-close="sheetSettings">Close</button></header>
+      <div class="row"><label>Google Sheets Web App URL (Apps Script)</label><input id="sheetsUrl" type="url" placeholder="https://script.google.com/macros/s/…/exec"></div>
+      <div class="row"><label>Secret token (optional, case‑sensitive)</label><input id="secret" type="text" placeholder="e.g., MUKJA-2025"></div>
+      <div class="row"><label><input id="syncOnSave" type="checkbox" style="width:auto;margin-right:8px">Sync to Google Sheets on Save</label><div></div></div>
+      <div class="row"><label><input id="autoBackup" type="checkbox" style="width:auto;margin-right:8px">Auto-download JSON backup after Save</label><div></div></div>
+      <div class="row"><label><input id="showPOS" type="checkbox" style="width:auto;margin-right:8px">Show POS expected drawer field</label><div></div></div>
+      <div><button class="btn secondary" id="btnTest">Test Sync</button></div>
+    </div>
+  </div>
 
-    <section id="settings" aria-hidden="true" class="screenOnly">
-      <div class="card">
-        <div style="font-weight:900;font-size:18px;margin-bottom:8px">Settings</div>
-        <div class="row"><label>Google Sheets Web App URL (Apps Script)</label><input id="sheetsUrl" type="url" placeholder="https://script.google.com/macros/s/…/exec"></div>
-        <div class="row"><label>Secret token (optional, case‑sensitive)</label><input id="secret" type="text" placeholder="e.g., MUKJA-2025"></div>
-        <div class="row"><label><input id="syncOnSave" type="checkbox" style="width:auto;margin-right:8px">Sync to Google Sheets on Save</label><div></div></div>
-        <div class="row"><label><input id="autoBackup" type="checkbox" style="width:auto;margin-right:8px">Auto-download JSON backup after Save</label><div></div></div>
-        <div class="row"><label><input id="showPOS" type="checkbox" style="width:auto;margin-right:8px">Show POS expected drawer field</label><div></div></div>
-        <div class="small">Tip: Add this page to Home Screen for a full‑screen feel.</div>
+  <div class="sheet" id="sheetHistory" aria-hidden="true">
+    <div class="panel">
+      <header><div style="font-weight:900">History</div><button class="close" data-close="sheetHistory">Close</button></header>
+      <div class="bar" style="margin-bottom:8px">
+        <button id="exportCsv" class="btn secondary">Export CSV</button>
+        <button id="exportJson" class="btn secondary">Export JSON</button>
+        <label class="btn secondary" for="importJson" style="cursor:pointer">Import JSON</label>
+        <input id="importJson" type="file" accept="application/json" style="display:none">
+        <button id="clear" class="btn secondary">Clear All</button>
       </div>
-    </section>
+      <div class="small" style="margin-top:4px">Device‑local log. Export CSV/JSON to move or back up.</div>
+      <div style="margin-top:10px;overflow:auto">
+        <table id="tbl" style="width:100%;border-collapse:collapse;border:1px solid var(--line)">
+          <thead>
+            <tr style="background:#eef2ff;color:#0b0b0f">
+              <th style="padding:8px;text-align:left">Date</th>
+              <th style="padding:8px;text-align:left">Staff</th>
+              <th style="padding:8px;text-align:left">Total</th>
+              <th style="padding:8px;text-align:left">Net</th>
+              <th style="padding:8px;text-align:left">Deposit</th>
+              <th style="padding:8px;text-align:left">Other Cash‑Outs</th>
+              <th style="padding:8px;text-align:left">Short from Safe</th>
+              <th style="padding:8px;text-align:left">Total Out</th>
+              <th style="padding:8px;text-align:left">Over/Short vs POS</th>
+              <th style="padding:8px;text-align:left" class="small">Bills / Coins</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
   <div id="toast" class="toast" role="status" aria-live="polite">Saved</div>
@@ -255,22 +243,12 @@
 <script>
   const $ = id => document.getElementById(id);
   const fmt = n => new Intl.NumberFormat('en-US', {style:'currency', currency:'USD'}).format(Number.isFinite(n)?Math.round(n*100)/100:0);
-  const cfgKey='mukja_cfg_iphone_mini', logKey='mukja_log_v1';
+  const cfgKey='mukja_cfg_iphone_ultra', logKey='mukja_log_v1';
   const today = new Date(); const tz = new Date(today.getTime()-today.getTimezoneOffset()*60000).toISOString().slice(0,10);
   $('date').value = tz;
-  $('btnPrint').addEventListener('click', () => { fillPrintSummary(); window.print(); });
+  $('btnPrint').addEventListener('click', () => { robustPrint(); });
   function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1400); }
   function v(id){ const el=$(id); const x=parseFloat(el?.value||''); return Number.isFinite(x)?Math.max(0,x):0; }
-
-  const sections = {count:$('count'), history:$('history'), settings:$('settings')};
-  function showTab(name){
-    for(const k in sections){ sections[k].setAttribute('aria-hidden', k===name ? 'false':'true'); }
-    for(const b of document.querySelectorAll('.tab')){ b.setAttribute('aria-selected', b.id==='tab-'+name ? 'true':'false'); }
-  }
-  $('tab-count').addEventListener('click', ()=>showTab('count'));
-  $('tab-history').addEventListener('click', ()=>{ loadHistory(); showTab('history'); });
-  $('tab-settings').addEventListener('click', ()=>{ loadCfgToUI(); showTab('settings'); });
-
   const segDenom = $('segDenom'), segSingle = $('segSingle');
   const billsDenomBox = $('billsDenomBox'), billsSingleBox = $('billsSingleBox');
   function setMode(single=false){
@@ -285,19 +263,20 @@
   segDenom.addEventListener('click', () => setMode(false));
   segSingle.addEventListener('click', () => setMode(true));
 
-  const ids = ['amt100','amt50','amt20','amt10','amt5','amt1','billsSingle','coins','voids','posExpected'];
+  const ids = ['amt100','amt50','amt20','amt10','amt5','amt1','billsSingle','coins','voids','posExpected','staff'];
   ids.forEach(i => $(i)?.addEventListener('input', (e) => {
     const x=parseFloat(e.target.value);
     if(e.target.type==='number' && Number.isFinite(x) && x<0){ e.target.value='0'; }
     compute();
   }));
+  $('staff')?.addEventListener('change', compute);
 
   document.addEventListener('click', (e)=>{
     const btn = e.target.closest('.copy'); if(!btn) return;
     const targetId = btn.getAttribute('data-copy'); const el = $(targetId);
     if(!el) return; const text = el.textContent.replace(/[^\d.-]/g,'');
     if(navigator.clipboard?.writeText){
-      navigator.clipboard.writeText(text).then(()=> toast('Copied'));
+      navigator.clipboard.writeText(text).then(()=> toast('Copied')).catch(()=>{});
     }
   });
 
@@ -343,6 +322,7 @@
 
   function getCfg(){ try{ return JSON.parse(localStorage.getItem(cfgKey)||'{}'); }catch{return {};} }
   function setCfg(o){ localStorage.setItem(cfgKey, JSON.stringify(o)); }
+
   $('saveEntry').addEventListener('click', () => {
     const entry = collectEntry();
     const arr = JSON.parse(localStorage.getItem(logKey)||'[]'); arr.push(entry); localStorage.setItem(logKey, JSON.stringify(arr));
@@ -357,60 +337,7 @@
     } else { toast('Saved'); }
   });
 
-  function loadHistory(){
-    const arr=JSON.parse(localStorage.getItem(logKey)||'[]'); arr.sort((a,b)=>b.ts-a.ts);
-    const tb=document.querySelector('#tbl tbody'); tb.innerHTML='';
-    for(const r of arr){
-      const tr=document.createElement('tr');
-      tr.innerHTML=`
-        <td>${r.d||''}</td>
-        <td>${(r.staff||'')}</td>
-        <td class="mono">${fmt(r.total||0)}</td>
-        <td class="mono">${fmt(r.net||0)}</td>
-        <td class="mono">${fmt(r.deposit||0)}</td>
-        <td class="mono">${fmt(r.other||0)}</td>
-        <td class="mono">${fmt(r.shortage||0)}</td>
-        <td class="mono">${fmt(r.totalOut||0)}</td>
-        <td class="mono">${r.posDelta!==undefined?fmt(r.posDelta):''}</td>
-        <td class="small mono">Bills: ${fmt(r.depBills||0)} / Coins: ${fmt(r.depCoins||0)}</td>
-      `;
-      tb.appendChild(tr);
-    }
-  }
-
-  function toCSV(){
-    const arr=JSON.parse(localStorage.getItem(logKey)||'[]');
-    const cols=['date','staff','total','net','deposit','other_cash_outs','short_from_safe','total_out','over_short_vs_pos','dep_bills','dep_coins','bills','coins','ts'];
-    const rows=[cols.join(',')];
-    for(const r of arr){
-      rows.push([r.d, r.staff, r.total, r.net, r.deposit, r.other, r.shortage, r.totalOut, (r.posDelta!==undefined?r.posDelta:''), r.depBills, r.depCoins, r.bills, r.coins, r.ts].map(x=>x??'').join(','));
-    }
-    return rows.join('\n');
-  }
-  function download(name, text, mime){
-    const blob=new Blob([text],{type:mime}); const url=URL.createObjectURL(blob);
-    const a=document.createElement('a'); a.href=url; a.download=name; a.click(); URL.revokeObjectURL(url);
-  }
-  document.addEventListener('click', (e)=>{
-    if(e.target && e.target.id==='exportCsv'){ download('cashout_history.csv', toCSV(), 'text/csv'); }
-    if(e.target && e.target.id==='exportJson'){ const arr=JSON.parse(localStorage.getItem(logKey)||'[]'); download('cashout_history.json', JSON.stringify(arr,null,2), 'application/json'); }
-  });
-  $('importJson').addEventListener('change', (e)=>{
-    const file=e.target.files[0]; if(!file) return;
-    const r=new FileReader();
-    r.onload=()=>{
-      try{
-        const incoming=JSON.parse(r.result||'[]');
-        const curr=JSON.parse(localStorage.getItem(logKey)||'[]');
-        const seen=new Set(curr.map(x=>String(x.ts)));
-        const merged=[...curr];
-        for(const row of incoming){ const id=String(row.ts); if(!seen.has(id)){ merged.push(row); seen.add(id); } }
-        localStorage.setItem(logKey, JSON.stringify(merged)); loadHistory(); alert('Import complete.');
-      }catch(err){ alert('Bad JSON file.'); }
-    };
-    r.readAsText(file);
-  });
-
+  $('btnPrint').addEventListener('click', () => { robustPrint(); });
   function fillPrintSummary(){
     const cfg = getCfg();
     const bills = billsValue(), coins=v('coins'), other=v('voids'), total=bills+coins, net=total-other, FLOAT=200;
@@ -437,13 +364,166 @@
     }
   }
 
+  function openSheet(id){ const s=$(id); s.style.display='flex'; s.setAttribute('aria-hidden','false'); }
+  function closeSheet(id){ const s=$(id); s.style.display='none'; s.setAttribute('aria-hidden','true'); }
+  $('btnSettings').addEventListener('click', ()=>{ loadCfgToUI(); openSheet('sheetSettings'); });
+  $('btnHistory').addEventListener('click', ()=>{ loadHistory(); openSheet('sheetHistory'); });
+  document.addEventListener('click', (e)=>{ const c=e.target.closest('.close'); if(c){ closeSheet(c.getAttribute('data-close')); } });
+  document.addEventListener('click', (e)=>{ const s=e.target.classList.contains('sheet')?e.target:null; if(s){ closeSheet(s.id); } });
+
   function loadCfgToUI(){
     const c=getCfg(); $('sheetsUrl').value=c.sheetsUrl||''; $('secret').value=c.secret||'';
     $('syncOnSave').checked=!!c.syncOnSave; $('autoBackup').checked=!!c.autoBackup; $('showPOS').checked=!!c.showPOS;
     compute();
   }
-  $('btnSettings').addEventListener('click', ()=>{ loadCfgToUI(); showTab('settings'); });
-  $('btnSaveCfg')?.addEventListener('click', ()=>{}); // placeholder
+  $('showPOS')?.addEventListener('change', ()=>{ const o=getCfg(); o.showPOS=$('showPOS').checked; setCfg(o); compute(); });
+
+  $('btnTest').addEventListener('click', async ()=>{
+    const url=$('sheetsUrl').value.trim(); if(!url){ toast('Add your Web App URL first'); return; }
+    try{ await fetch(url+'?ping=1', {method:'GET', mode:'no-cors'}); toast('Ping sent'); }catch{ toast('Ping failed'); }
+  });
+
+  function loadHistory(){
+    const arr=JSON.parse(localStorage.getItem(logKey)||'[]'); arr.sort((a,b)=>b.ts-a.ts);
+    const tb=document.querySelector('#tbl tbody'); tb.innerHTML='';
+    for(const r of arr){
+      const tr=document.createElement('tr');
+      tr.innerHTML=`
+        <td style="padding:8px">${r.d||''}</td>
+        <td style="padding:8px">${(r.staff||'')}</td>
+        <td style="padding:8px" class="mono">${fmt(r.total||0)}</td>
+        <td style="padding:8px" class="mono">${fmt(r.net||0)}</td>
+        <td style="padding:8px" class="mono">${fmt(r.deposit||0)}</td>
+        <td style="padding:8px" class="mono">${fmt(r.other||0)}</td>
+        <td style="padding:8px" class="mono">${fmt(r.shortage||0)}</td>
+        <td style="padding:8px" class="mono">${fmt(r.totalOut||0)}</td>
+        <td style="padding:8px" class="mono">${r.posDelta!==undefined?fmt(r.posDelta):''}</td>
+        <td style="padding:8px" class="small mono">Bills: ${fmt(r.depBills||0)} / Coins: ${fmt(r.depCoins||0)}</td>
+      `;
+      tb.appendChild(tr);
+    }
+  }
+  function toCSV(){
+    const arr=JSON.parse(localStorage.getItem(logKey)||'[]');
+    const cols=['date','staff','total','net','deposit','other_cash_outs','short_from_safe','total_out','over_short_vs_pos','dep_bills','dep_coins','bills','coins','ts'];
+    const rows=[cols.join(',')];
+    for(const r of arr){
+      rows.push([r.d, r.staff, r.total, r.net, r.deposit, r.other, r.shortage, r.totalOut, (r.posDelta!==undefined?r.posDelta:''), r.depBills, r.depCoins, r.bills, r.coins, r.ts].map(x=>x??'').join(','));
+    }
+    return rows.join('\n');
+  }
+  function download(name, text, mime){
+    const blob=new Blob([text],{type:mime}); const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download=name; a.click(); URL.revokeObjectURL(url);
+  }
+  document.addEventListener('click', (e)=>{
+    if(e.target && e.target.id==='exportCsv'){ download('cashout_history.csv', toCSV(), 'text/csv'); }
+    if(e.target && e.target.id==='exportJson'){ const arr=JSON.parse(localStorage.getItem(logKey)||'[]'); download('cashout_history.json', JSON.stringify(arr,null,2), 'application/json'); }
+  });
+  document.getElementById('importJson').addEventListener('change', (e)=>{
+    const file=e.target.files[0]; if(!file) return;
+    const r=new FileReader();
+    r.onload=()=>{
+      try{
+        const incoming=JSON.parse(r.result||'[]');
+        const curr=JSON.parse(localStorage.getItem(logKey)||'[]');
+        const seen=new Set(curr.map(x=>String(x.ts)));
+        const merged=[...curr];
+        for(const row of incoming){ const id=String(row.ts); if(!seen.has(id)){ merged.push(row); seen.add(id); } }
+        localStorage.setItem(logKey, JSON.stringify(merged)); loadHistory(); alert('Import complete.');
+      }catch(err){ alert('Bad JSON file.'); }
+    };
+    r.readAsText(file);
+  });
+
+  function quickPrint(){
+    fillPrintSummary();
+    try{
+      const src = document.getElementById('printSummary').innerHTML;
+      const css = `
+        @page{size:auto; margin:0.5in}
+        body{background:#fff;color:#000;font:12px/1.35 -apple-system,system-ui,Arial;margin:0;padding:0}
+        .card{background:#fff;border:1px solid #ccc;border-radius:12px;padding:14px;margin:10px 0;box-shadow:none}
+        .kv{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px dashed #ccc}
+        .kv:last-child{border-bottom:0}
+        h1{font-size:18px;margin:0 0 6px 0}
+        .mono{font-variant-numeric:tabular-nums}
+      `;
+      const w = window.open('', '_blank', 'noopener,noreferrer');
+      if(!w){ window.print(); return; }
+      w.document.open();
+      w.document.write(`<!doctype html><html><head><meta charset=\"utf-8\"><title>Cash-Out</title><style>${css}</style></head><body>${src}</body></html>`);
+      w.document.close();
+      w.focus();
+      setTimeout(()=>{ try{ w.print(); } finally { w.close(); } }, 150);
+    }catch(e){
+      window.print();
+    }
+  }
+
+
+  // Denomination sanitizers: snap to valid multiples on blur
+  const denomUnits = { amt100:100, amt50:50, amt20:20, amt10:10, amt5:5, amt1:1 };
+  for (const [id,unit] of Object.entries(denomUnits)) {
+    const el = document.getElementById(id);
+    if(el){
+      el.addEventListener('blur', () => {
+        const raw = parseFloat(el.value||'');
+        if(Number.isFinite(raw)){
+          const fixed = Math.floor(raw / unit) * unit; // snap DOWN to multiple
+          if(fixed !== raw){ el.value = String(fixed); }
+        } else { el.value = ''; }
+        compute();
+      });
+    }
+  }
+  // Coins: if user enters cents (no dot), convert to dollars on blur: 555 -> 5.55
+  (function(){
+    const el = document.getElementById('coins');
+    if(!el) return;
+    el.addEventListener('blur', () => {
+      const s = (el.value||'').trim();
+      if(!s) return;
+      if(!s.includes('.')){
+        const cents = parseInt(s,10);
+        if(Number.isFinite(cents)){
+          el.value = (cents/100).toFixed(2);
+          compute();
+        }
+      } else {
+        // normalize to two decimals
+        const f = parseFloat(s);
+        if(Number.isFinite(f)) el.value = (Math.round(f*100)/100).toFixed(2);
+      }
+    });
+  })();
+
+  // Robust print using hidden iframe (works better across Safari/Edge)
+  function robustPrint(){
+    fillPrintSummary();
+    try{
+      const src = document.getElementById('printSummary').innerHTML;
+      const css = \`
+        @page{size:auto; margin:0.5in}
+        body{background:#fff;color:#000;font:12px/1.35 -apple-system,system-ui,Arial;margin:0;padding:0}
+        .card{background:#fff;border:1px solid #ccc;border-radius:12px;padding:14px;margin:10px 0;box-shadow:none}
+        .kv{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px dashed #ccc}
+        .kv:last-child{border-bottom:0}
+        h1{font-size:18px;margin:0 0 6px 0}
+        .mono{font-variant-numeric:tabular-nums}
+      \`;
+      const ifr = document.createElement('iframe');
+      ifr.style.position='fixed'; ifr.style.right='0'; ifr.style.bottom='0'; ifr.style.width='0'; ifr.style.height='0'; ifr.style.border='0';
+      document.body.appendChild(ifr);
+      const doc = ifr.contentWindow.document;
+      doc.open();
+      doc.write(\`<!doctype html><html><head><meta charset="utf-8"><title>Cash-Out</title><style>\${css}</style></head><body>\${src}</body></html>\`);
+      doc.close();
+      setTimeout(()=>{ ifr.contentWindow.focus(); ifr.contentWindow.print(); setTimeout(()=>document.body.removeChild(ifr), 500); }, 150);
+    }catch(e){
+      window.print();
+    }
+  }
 
 </script>
 </body>
