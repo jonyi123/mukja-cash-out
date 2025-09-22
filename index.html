@@ -96,7 +96,7 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{ -webkit-appe
       <div class="row"><label>Other Cash‑Outs</label><input id="voids" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00" aria-label="Other Cash-Outs"></div>
       <div class="small">Net cash = Bills + Coins − Other Cash‑Outs. Till ends at $200 automatically.</div>
 
-      <div id="posRow" class="row" style="display:none"><label>POS expected deposit (optional)</label><input id="posExpected" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
+      <div id="posRow" class="row" style="display:none"><label>POS expected deposit (optional)</label><input id="posExpected" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"><div class="small" style="grid-column:1/-1">Enter Z report “Cash”</div></div>
     </div>
 
     <div class="card">
@@ -146,6 +146,8 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{ -webkit-appe
       <h1>Mukja — Cash‑Out</h1>
       <div class="kv"><span>Date</span><span class="mono" id="p_date"></span></div>
       <div class="kv"><span>Staff</span><span class="mono" id="p_staff"></span></div>
+      <div class="kv"><span>Counted by</span><span class="mono" id="p_counted"></span></div>
+      <div class="kv"><span>Verified by</span><span class="mono">____________________</span></div>
     </div>
     <div class="card">
       <div class="kv"><span>TAKE TO BANK (Deposit)</span><span class="mono" id="p_deposit">$0.00</span></div>
@@ -267,6 +269,7 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{ -webkit-appe
     // Fill print summary
     $('p_date').textContent=$('date').value;
     $('p_staff').textContent=$('staff').value;
+    $('p_counted').textContent=$('staff').value;
     $('p_deposit').textContent=fmt(deposit);
     $('p_other').textContent=fmt(other);
     $('p_short').textContent=fmt(shortage);
@@ -304,10 +307,49 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{ -webkit-appe
   // Clear
   function clearAll(){
     ['amt100','amt50','amt20','amt10','amt5','amt1','billsSingle','coins','voids','posExpected'].forEach(id=>{ const el=$(id); if(el){ el.value=''; } });
+    setToday();
     compute();
   }
   $('btnClear').addEventListener('click', clearAll);
 })();
+
+  // Restore last staff on load; save on change
+  (function(){
+    try{
+      const saved = localStorage.getItem('mukja_staff');
+      if(saved && $('staff')){ $('staff').value = saved; }
+      $('staff')?.addEventListener('change', ()=>localStorage.setItem('mukja_staff',$('staff').value));
+    }catch(e){}
+  })();
+
+  // POS expected deposit normalization: allow cents without dot (11057 -> 110.57)
+  (function(){
+    const el = $('posExpected'); if(!el) return;
+    const normalize = () => {
+      const s = (el.value||'').trim();
+      if(!s) return;
+      if(/^\d+$/.test(s) && s.length > 2){
+        // treat as cents
+        const dollars = (parseInt(s,10)/100).toFixed(2);
+        el.value = dollars;
+      } else {
+        const f = parseFloat(s);
+        if(Number.isFinite(f)) el.value = (Math.round(f*100)/100).toFixed(2);
+      }
+      compute();
+    };
+    el.addEventListener('blur', normalize);
+    el.addEventListener('change', normalize);
+  })();
+
+  // Format Over/Short text as "OVER $X" or "SHORT $X"
+  function setPosDeltaText(delta){
+    const abs = Math.abs(Math.round(delta*100)/100);
+    const signText = delta < 0 ? 'SHORT ' : (delta > 0 ? 'OVER ' : '');
+    const formatted = new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(abs);
+    return signText ? (signText + formatted) : formatted;
+  }
+
 </script>
 </body>
 </html>
