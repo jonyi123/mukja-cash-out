@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>Mukja – Cash‑Out (Simple)</title>
+<title>Mukja – Cash‑Out</title>
 <style>
 :root{
   --bg:#0b0b10; --surface:#14161a; --ink:#f3f4f6; --muted:#a1a1aa; --line:#26272b; --accent:#0a84ff;
@@ -21,7 +21,6 @@ body{margin:0;background:var(--bg);color:var(--ink);
   -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;-webkit-tap-highlight-color:transparent}
 .wrap{max-width:720px;margin-inline:auto;padding:14px;padding-bottom:calc(env(safe-area-inset-bottom,0)+18px)}
 h1{margin:0 0 10px 0;font-size:22px;font-weight:900}
-.sub{margin:0;color:var(--muted);font-size:13px}
 header{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:10px}
 .bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .btn{appearance:none;background:var(--accent);color:#fff;border:0;border-radius:12px;padding:10px 14px;font-weight:800;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.12);min-height:44px}
@@ -43,7 +42,6 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{ -webkit-appe
 .barL{width:10px;height:100%;border-radius:8px}
 .action .title{font-size:17px;font-weight:900;margin:0}
 .action .amt{font-size:24px;font-weight:1000;display:flex;align-items:center;gap:8px}
-.copy{font-size:13px;padding:6px 8px;border-radius:10px;border:1px solid var(--line);background:transparent;cursor:pointer;min-height:36px}
 .bank .barL{background:var(--red)} .home .barL{background:var(--blue)} .safe .barL{background:var(--amber)} .ok .barL{background:var(--green)} .total .barL{background:var(--violet)}
 .bank .amt{color:var(--red)} .home .amt{color:var(--blue)} .safe .amt{color:var(--amber)} .ok .amt{color:var(--green)} .total .amt{color:var(--violet)}
 .kv{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line)} .kv:last-child{border-bottom:0}
@@ -59,7 +57,6 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{ -webkit-appe
   <header class="screenOnly">
     <div>
       <h1>Mukja — End‑of‑Day Cash‑Out</h1>
-      
     </div>
     <div class="bar">
       <button class="btn" id="btnPrint">Print</button>
@@ -99,7 +96,7 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{ -webkit-appe
       <div class="row"><label>Other Cash‑Outs</label><input id="voids" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00" aria-label="Other Cash-Outs"></div>
       <div class="small">Net cash = Bills + Coins − Other Cash‑Outs. Till ends at $200 automatically.</div>
 
-      <div id="posRow" class="row" style="display:none"><label>POS expected drawer (optional)</label><input id="posExpected" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
+      <div id="posRow" class="row" style="display:none"><label>POS expected deposit (optional)</label><input id="posExpected" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
     </div>
 
     <div class="card">
@@ -139,7 +136,7 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{ -webkit-appe
       <div class="kv"><span>Net after cash‑outs</span><span class="mono" id="net">$0.00</span></div>
       <div class="kv"><span>Deposit: Coins</span><span class="mono" id="depCoins">$0.00</span></div>
       <div class="kv"><span>Deposit: Bills</span><span class="mono" id="depBills">$0.00</span></div>
-      <div id="posKv" class="kv" style="display:none"><span>Over/Short vs POS expected</span><span class="mono" id="posDelta">$0.00</span></div>
+      <div id="posKv" class="kv" style="display:none"><span>Over/Short vs POS expected deposit</span><span class="mono" id="posDelta">$0.00</span></div>
     </div>
   </section>
 
@@ -161,7 +158,7 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{ -webkit-appe
       <div class="kv"><span>Net after cash‑outs</span><span class="mono" id="p_net">$0.00</span></div>
       <div class="kv"><span>Deposit: Bills</span><span class="mono" id="p_depBills">$0.00</span></div>
       <div class="kv"><span>Deposit: Coins</span><span class="mono" id="p_depCoins">$0.00</span></div>
-      <div class="kv" id="p_posRow" style="display:none"><span>Over/Short vs POS expected</span><span class="mono" id="p_posDelta">$0.00</span></div>
+      <div class="kv" id="p_posRow" style="display:none"><span>Over/Short vs POS expected deposit</span><span class="mono" id="p_posDelta">$0.00</span></div>
     </div>
   </section>
 </div>
@@ -173,7 +170,7 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{ -webkit-appe
       <div style="font-weight:900">Settings</div>
       <button class="btn secondary" id="closeSettings">Close</button>
     </div>
-    <div class="row"><label><input id="showPOS" type="checkbox" style="width:auto;margin-right:8px">Show POS expected drawer field</label><div></div></div>
+    <div class="row"><label><input id="showPOS" type="checkbox" checked disabled style="width:auto;margin-right:8px">Show POS expected deposit row (always on)</label><div></div></div>
   </div>
 </div>
 
@@ -187,7 +184,7 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{ -webkit-appe
   const setCfg=o=>localStorage.setItem('mukja_cfg_simple',JSON.stringify(o));
   function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1400);}
 
-  // 1) Reliable date default
+  // 1) Date default (reliable across iOS/Android/Desktop)
   function setToday(){
     const el=$('date'); const now=new Date();
     try{ el.valueAsDate=new Date(now.getFullYear(),now.getMonth(),now.getDate()); }catch(e){}
@@ -212,28 +209,27 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{ -webkit-appe
   segDenom.addEventListener('click',()=>setMode(false));
   segSingle.addEventListener('click',()=>setMode(true));
 
-  // 3) Strict denomination validators
+  // 3) Strict denomination validators (snap on blur/change only)
   function snapMultipleInt(val,unit){ if(!Number.isFinite(val)||val<0) return 0; val=Math.floor(val); return Math.floor(val/unit)*unit; }
   const denomStrict=[['amt100',100],['amt50',50],['amt20',20],['amt10',10],['amt5',5]];
   denomStrict.forEach(([id,u])=>{
     const el=$(id); if(!el) return;
     const handler=()=>{const raw=parseFloat(el.value); if(!Number.isFinite(raw)){el.value=''; compute(); return;} const snap=snapMultipleInt(raw,u); if(String(snap)!==el.value) el.value=String(snap); compute();};
-    // allow free typing; snap only when leaving field or committing
     el.addEventListener('change',handler); el.addEventListener('blur',handler);
   });
-  (function(){const el=$('amt1'); if(!el) return; const h=()=>{const raw=parseFloat(el.value); if(!Number.isFinite(raw)){el.value=''; compute(); return;} const snap=Math.max(0,Math.floor(raw)); if(String(snap)!==el.value) el.value=String(snap); compute();}; /* snap only on commit */ el.addEventListener('change',h); el.addEventListener('blur',h);})();
+  (function(){const el=$('amt1'); if(!el) return; const h=()=>{const raw=parseFloat(el.value); if(!Number.isFinite(raw)){el.value=''; compute(); return;} const snap=Math.max(0,Math.floor(raw)); if(String(snap)!==el.value) el.value=String(snap); compute();}; el.addEventListener('change',h); el.addEventListener('blur',h);})();
 
   // Single bills total: whole dollars only
-  (function(){const el=$('billsSingle'); if(!el) return; const h=()=>{const raw=parseFloat(el.value); if(!Number.isFinite(raw)){el.value=''; compute(); return;} const snap=Math.max(0,Math.floor(raw)); if(String(snap)!==el.value) el.value=String(snap); compute();}; /* snap only on commit */ el.addEventListener('change',h); el.addEventListener('blur',h);})();
+  (function(){const el=$('billsSingle'); if(!el) return; const h=()=>{const raw=parseFloat(el.value); if(!Number.isFinite(raw)){el.value=''; compute(); return;} const snap=Math.max(0,Math.floor(raw)); if(String(snap)!==el.value) el.value=String(snap); compute();}; el.addEventListener('change',h); el.addEventListener('blur',h);})();
 
-  // Coins cents helper
+  // Coins helper: "555" -> 5.55 (on blur/change)
   (function(){const el=$('coins'); if(!el) return; const normalize=()=>{const s=(el.value||'').trim(); if(!s) return; if(!s.includes('.')){const cents=parseInt(s,10); if(Number.isFinite(cents)) el.value=(cents/100).toFixed(2);} else {const f=parseFloat(s); if(Number.isFinite(f)) el.value=(Math.round(f*100)/100).toFixed(2);} compute();}; el.addEventListener('blur',normalize); el.addEventListener('change',normalize);})();
 
-  // POS expected toggle
-  const cfg=getCfg(); $('showPOS').checked=!!cfg.showPOS;
-  $('showPOS').addEventListener('change',()=>{const o=getCfg(); o.showPOS=$('showPOS').checked; setCfg(o); compute();});
+  // POS expected deposit visibility
+  const cfg=getCfg(); $('showPOS').checked=true; $('showPOS').setAttribute('disabled','');
+  $('showPOS').addEventListener('change',()=>{ $('showPOS').checked=true; });
 
-  // 4) Compute logic
+  // 4) Compute
   function billsValue(){ return boxDenom.style.display!=='none'
             ? (v('amt100')+v('amt50')+v('amt20')+v('amt10')+v('amt5')+v('amt1'))
             : v('billsSingle'); }
@@ -261,10 +257,14 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{ -webkit-appe
     if(shortage>0){ $('actSafe').style.display='grid'; $('actOk').style.display='none'; $('shortAmt').textContent=fmt(shortage); }
     else { $('actSafe').style.display='none'; $('actOk').style.display='grid'; }
 
-    const showPOS=getCfg().showPOS; $('posRow').style.display=showPOS?'':'none'; $('posKv').style.display=showPOS?'':'none';
-    if(showPOS){ const posExp=v('posExpected'); const delta=net-posExp; $('posDelta').textContent=fmt(delta); $('posDelta').style.color=delta<0?'#f87171':(delta>0?'#34d399':'inherit'); }
+    const posStr = ($('posExpected')?.value || '').trim();
+    const hasPos = posStr !== '' && !isNaN(parseFloat(posStr));
+    $('posRow').style.display = '';
+    $('posKv').style.display  = '';
+    if(hasPos){ const posExp=v('posExpected'); const delta=deposit-posExp; $('posDelta').textContent=fmt(delta); $('posDelta').style.color=delta<0?'#f87171':(delta>0?'#34d399':'inherit'); }
+    else { $('posDelta').textContent='—'; $('posDelta').style.color='inherit'; }
 
-    // Fill print summary live
+    // Fill print summary
     $('p_date').textContent=$('date').value;
     $('p_staff').textContent=$('staff').value;
     $('p_deposit').textContent=fmt(deposit);
@@ -275,15 +275,16 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{ -webkit-appe
     $('p_net').textContent=fmt(net);
     $('p_depBills').textContent=fmt(depBills);
     $('p_depCoins').textContent=fmt(depCoins);
-    if(showPOS){ document.getElementById('p_posRow').style.display='flex'; $('p_posDelta').textContent=fmt(net-v('posExpected')); }
-    else { document.getElementById('p_posRow').style.display='none'; }
+    document.getElementById('p_posRow').style.display='flex';
+    if(($('posExpected')?.value||'').trim()!==''){ $('p_posDelta').textContent=fmt(deposit - v('posExpected')); }
+    else { $('p_posDelta').textContent='—'; }
   }
 
   ['amt100','amt50','amt20','amt10','amt5','amt1','billsSingle','coins','voids','posExpected','staff','date']
     .forEach(id=>$(id)?.addEventListener('input',compute));
   compute();
 
-  // 5) Print — minimal iframe to avoid preview spin
+  // 5) Print via hidden iframe
   function robustPrint(){
     try{
       const src=document.getElementById('printSummary').innerHTML;
@@ -296,21 +297,16 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{ -webkit-appe
   }
   $('btnPrint').addEventListener('click', robustPrint);
 
+  // Settings
+  $('btnSettings').addEventListener('click',()=>{ document.getElementById('sheetSettings').style.display='flex'; });
+  $('closeSettings').addEventListener('click',()=>{ document.getElementById('sheetSettings').style.display='none'; });
 
-  // Clear all numeric fields (keeps Date and Staff)
+  // Clear
   function clearAll(){
     ['amt100','amt50','amt20','amt10','amt5','amt1','billsSingle','coins','voids','posExpected'].forEach(id=>{ const el=$(id); if(el){ el.value=''; } });
     compute();
   }
   $('btnClear').addEventListener('click', clearAll);
-
-
-  // Settings
-  $('btnSettings').addEventListener('click',()=>{ document.getElementById('sheetSettings').style.display='flex'; });
-  $('closeSettings').addEventListener('click',()=>{ document.getElementById('sheetSettings').style.display='none'; });
-
-  // Copy buttons
-  document.addEventListener('click',(e)=>{const btn=e.target.closest('.copy'); if(!btn) return; const id=btn.getAttribute('data-copy'); const text=document.getElementById(id)?.textContent.replace(/[^\d.-]/g,''); navigator.clipboard?.writeText(text||'').then(()=>toast('Copied'));});
 })();
 </script>
 </body>
