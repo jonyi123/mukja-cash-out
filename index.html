@@ -96,7 +96,7 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{ -webkit-appe
       <div class="row"><label>Other Cash‑Outs</label><input id="voids" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00" aria-label="Other Cash-Outs"></div>
       <div class="small">Net cash = Bills + Coins − Other Cash‑Outs. Till ends at $200 automatically.</div>
 
-      <div id="posRow" class="row" style="display:none"><label>POS expected deposit (optional)</label><input id="posExpected" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"><div class="small" style="grid-column:1/-1">Enter Z report “Cash”</div></div>
+      <div id="posRow" class="row"><label>POS expected deposit (optional)</label><input id="posExpected" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"><div class="small" style="grid-column:1/-1">Enter Z report “Cash”</div></div>
     </div>
 
     <div class="card">
@@ -132,13 +132,28 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{ -webkit-appe
         <div class="amt mono"><span id="leave">$200.00</span></div>
       </div>
 
+      <!-- Yellow‑sheet style math, straight down -->
       <div class="kv" style="margin-top:8px"><span>Total counted cash</span><span class="mono" id="total">$0.00</span></div>
+      <div class="kv"><span>Less: Other Cash‑Outs</span><span class="mono" id="otherNeg">−$0.00</span></div>
       <div class="kv"><span>Net after cash‑outs</span><span class="mono" id="net">$0.00</span></div>
-      <div class="kv"><span>Deposit: Coins</span><span class="mono" id="depCoins">$0.00</span></div>
+      <div class="kv"><span>Less: Keep in till</span><span class="mono" id="floatNeg">−$200.00</span></div>
+      <div class="kv"><span>Deposit (Take to bank)</span><span class="mono" id="depositLine">$0.00</span></div>
       <div class="kv"><span>Deposit: Bills</span><span class="mono" id="depBills">$0.00</span></div>
-      <div id="posKv" class="kv" style="display:none"><span>Over/Short vs POS expected deposit</span><span class="mono" id="posDelta">$0.00</span></div>
+      <div class="kv"><span>Deposit: Coins</span><span class="mono" id="depCoins">$0.00</span></div>
+      <div class="kv"><span>POS expected deposit</span><span class="mono" id="posExpectedLine">—</span></div>
+      <div id="posKv" class="kv"><span>Over/Short vs POS expected deposit</span><span class="mono" id="posDelta">—</span></div>
     </div>
   </section>
+
+  <!-- Save & History -->
+  <div class="card screenOnly">
+    <p class="step"><span class="dot"></span> Save & History</p>
+    <div class="bar">
+      <button class="btn secondary" id="btnSaveCSV">Save CSV</button>
+      <button class="btn" id="btnSaveGitHub">Save to GitHub</button>
+    </div>
+    <div class="small">Downloads a CSV to your device. "Save to GitHub" appends to <span id="ghPathPreview">history/history.csv</span> on your repo (if configured in Settings).</div>
+  </div>
 
   <!-- PRINT SUMMARY -->
   <section id="printSummary" class="printOnly">
@@ -160,7 +175,7 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{ -webkit-appe
       <div class="kv"><span>Net after cash‑outs</span><span class="mono" id="p_net">$0.00</span></div>
       <div class="kv"><span>Deposit: Bills</span><span class="mono" id="p_depBills">$0.00</span></div>
       <div class="kv"><span>Deposit: Coins</span><span class="mono" id="p_depCoins">$0.00</span></div>
-      <div class="kv" id="p_posRow" style="display:none"><span>Over/Short vs POS expected deposit</span><span class="mono" id="p_posDelta">$0.00</span></div>
+      <div class="kv" id="p_posRow" style="display:flex"><span>Over/Short vs POS expected deposit</span><span class="mono" id="p_posDelta">—</span></div>
     </div>
   </section>
 </div>
@@ -173,6 +188,12 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{ -webkit-appe
       <button class="btn secondary" id="closeSettings">Close</button>
     </div>
     <div class="row"><label><input id="showPOS" type="checkbox" checked disabled style="width:auto;margin-right:8px">Show POS expected deposit row (always on)</label><div></div></div>
+    <div class="row"><label>GitHub owner (username or org)</label><input id="ghOwner" placeholder="e.g., jonyi123"></div>
+    <div class="row"><label>GitHub repo</label><input id="ghRepo" placeholder="e.g., mukja-cash-out"></div>
+    <div class="row"><label>History file path</label><input id="ghPath" placeholder="history/history.csv"></div>
+    <div class="row"><label>Branch</label><input id="ghBranch" placeholder="main"></div>
+    <div class="row"><label>GitHub token (fine-grained, contents: read/write)</label><input id="ghToken" type="password" autocomplete="new-password" autocapitalize="off" spellcheck="false" placeholder="ghp_..."></div>
+    <div class="bar"><button class="btn" id="saveGhCfg">Save settings</button></div>
   </div>
 </div>
 
@@ -182,11 +203,10 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{ -webkit-appe
 (function(){
   const $=id=>document.getElementById(id);
   const fmt=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(Number.isFinite(n)?Math.round(n*100)/100:0);
-  const getCfg=()=>{try{return JSON.parse(localStorage.getItem('mukja_cfg_simple')||'{}');}catch{return{};}};
+  const getCfg=()=>{try{return JSON.parse(localStorage.getItem('mukja_cfg_simple')||'{}');}catch{return{}}};
   const setCfg=o=>localStorage.setItem('mukja_cfg_simple',JSON.stringify(o));
   function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1400);}
 
-  // 1) Date default (reliable across iOS/Android/Desktop)
   function setToday(){
     const el=$('date'); const now=new Date();
     try{ el.valueAsDate=new Date(now.getFullYear(),now.getMonth(),now.getDate()); }catch(e){}
@@ -194,47 +214,38 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{ -webkit-appe
   }
   document.addEventListener('DOMContentLoaded', setToday);
 
-  // 2) Mode toggle
   const segDenom=$('segDenom'), segSingle=$('segSingle'), boxDenom=$('billsDenomBox'), boxSingle=$('billsSingleBox');
   function setMode(single){
-    if(single){
-      segSingle.classList.add('active'); segSingle.setAttribute('aria-selected','true');
-      segDenom.classList.remove('active'); segDenom.setAttribute('aria-selected','false');
-      boxSingle.style.display='block'; boxDenom.style.display='none';
-    }else{
-      segDenom.classList.add('active'); segDenom.setAttribute('aria-selected','true');
-      segSingle.classList.remove('active'); segSingle.setAttribute('aria-selected','false');
-      boxDenom.style.display='block'; boxSingle.style.display='none';
-    }
+    if(single){ segSingle.classList.add('active'); segDenom.classList.remove('active'); boxSingle.style.display='block'; boxDenom.style.display='none'; }
+    else{ segDenom.classList.add('active'); segSingle.classList.remove('active'); boxDenom.style.display='block'; boxSingle.style.display='none'; }
     compute();
   }
   segDenom.addEventListener('click',()=>setMode(false));
   segSingle.addEventListener('click',()=>setMode(true));
 
-  // 3) Strict denomination validators (snap on blur/change only)
   function snapMultipleInt(val,unit){ if(!Number.isFinite(val)||val<0) return 0; val=Math.floor(val); return Math.floor(val/unit)*unit; }
-  const denomStrict=[['amt100',100],['amt50',50],['amt20',20],['amt10',10],['amt5',5]];
-  denomStrict.forEach(([id,u])=>{
+  [['amt100',100],['amt50',50],['amt20',20],['amt10',10],['amt5',5]].forEach(([id,u])=>{
     const el=$(id); if(!el) return;
-    const handler=()=>{const raw=parseFloat(el.value); if(!Number.isFinite(raw)){el.value=''; compute(); return;} const snap=snapMultipleInt(raw,u); if(String(snap)!==el.value) el.value=String(snap); compute();};
-    el.addEventListener('change',handler); el.addEventListener('blur',handler);
+    const h=()=>{const raw=parseFloat(el.value); if(!Number.isFinite(raw)){el.value=''; compute(); return;} const snap=snapMultipleInt(raw,u); if(String(snap)!==el.value) el.value=String(snap); compute();};
+    el.addEventListener('change',h); el.addEventListener('blur',h);
   });
   (function(){const el=$('amt1'); if(!el) return; const h=()=>{const raw=parseFloat(el.value); if(!Number.isFinite(raw)){el.value=''; compute(); return;} const snap=Math.max(0,Math.floor(raw)); if(String(snap)!==el.value) el.value=String(snap); compute();}; el.addEventListener('change',h); el.addEventListener('blur',h);})();
-
-  // Single bills total: whole dollars only
   (function(){const el=$('billsSingle'); if(!el) return; const h=()=>{const raw=parseFloat(el.value); if(!Number.isFinite(raw)){el.value=''; compute(); return;} const snap=Math.max(0,Math.floor(raw)); if(String(snap)!==el.value) el.value=String(snap); compute();}; el.addEventListener('change',h); el.addEventListener('blur',h);})();
 
-  // Coins helper: "555" -> 5.55 (on blur/change)
   (function(){const el=$('coins'); if(!el) return; const normalize=()=>{const s=(el.value||'').trim(); if(!s) return; if(!s.includes('.')){const cents=parseInt(s,10); if(Number.isFinite(cents)) el.value=(cents/100).toFixed(2);} else {const f=parseFloat(s); if(Number.isFinite(f)) el.value=(Math.round(f*100)/100).toFixed(2);} compute();}; el.addEventListener('blur',normalize); el.addEventListener('change',normalize);})();
+  (function(){const el=$('posExpected'); if(!el) return; const normalize=()=>{const s=(el.value||'').trim(); if(!s) return; if(/^\d+$/.test(s)&&s.length>2){el.value=(parseInt(s,10)/100).toFixed(2);} else {const f=parseFloat(s); if(Number.isFinite(f)) el.value=(Math.round(f*100)/100).toFixed(2);} compute();}; el.addEventListener('blur',normalize); el.addEventListener('change',normalize);})();
 
-  // POS expected deposit visibility
-  const cfg=getCfg(); $('showPOS').checked=true; $('showPOS').setAttribute('disabled','');
+  $('showPOS').checked=true; $('showPOS').setAttribute('disabled','');
   $('showPOS').addEventListener('change',()=>{ $('showPOS').checked=true; });
 
-  // 4) Compute
-  function billsValue(){ return boxDenom.style.display!=='none'
-            ? (v('amt100')+v('amt50')+v('amt20')+v('amt10')+v('amt5')+v('amt1'))
-            : v('billsSingle'); }
+  function setPosDeltaText(delta){
+    const abs = Math.abs(Math.round(delta*100)/100);
+    const signText = delta < 0 ? 'SHORT ' : (delta > 0 ? 'OVER ' : '');
+    const formatted = new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(abs);
+    return signText ? (signText + formatted) : formatted;
+  }
+
+  function billsValue(){ return boxDenom.style.display!=='none' ? (v('amt100')+v('amt50')+v('amt20')+v('amt10')+v('amt5')+v('amt1')) : v('billsSingle'); }
   function v(id){ const el=$(id); const x=parseFloat(el?.value||''); return Number.isFinite(x)?Math.max(0,x):0; }
 
   function compute(){
@@ -249,7 +260,10 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{ -webkit-appe
     const totalOut=deposit+other;
 
     $('total').textContent=fmt(total);
+    $('otherNeg').textContent='−'+fmt(other);
     $('net').textContent=fmt(net);
+    $('floatNeg').textContent='−'+fmt(FLOAT);
+    $('depositLine').textContent=fmt(deposit);
     $('voidHome').textContent=fmt(other);
     $('deposit').textContent=fmt(deposit);
     $('depCoins').textContent=fmt(depCoins);
@@ -261,12 +275,10 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{ -webkit-appe
 
     const posStr = ($('posExpected')?.value || '').trim();
     const hasPos = posStr !== '' && !isNaN(parseFloat(posStr));
-    $('posRow').style.display = '';
-    $('posKv').style.display  = '';
-    if(hasPos){ const posExp=v('posExpected'); const delta=deposit-posExp; $('posDelta').textContent=fmt(delta); $('posDelta').style.color=delta<0?'#f87171':(delta>0?'#34d399':'inherit'); }
+    $('posExpectedLine').textContent = hasPos ? fmt(v('posExpected')) : '—';
+    if(hasPos){ const posExp=v('posExpected'); const delta=deposit-posExp; $('posDelta').textContent=setPosDeltaText(delta); $('posDelta').style.color=delta<0?'#f87171':(delta>0?'#34d399':'inherit'); }
     else { $('posDelta').textContent='—'; $('posDelta').style.color='inherit'; }
 
-    // Fill print summary
     $('p_date').textContent=$('date').value;
     $('p_staff').textContent=$('staff').value;
     $('p_counted').textContent=$('staff').value;
@@ -278,16 +290,13 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{ -webkit-appe
     $('p_net').textContent=fmt(net);
     $('p_depBills').textContent=fmt(depBills);
     $('p_depCoins').textContent=fmt(depCoins);
-    document.getElementById('p_posRow').style.display='flex';
-    if(($('posExpected')?.value||'').trim()!==''){ $('p_posDelta').textContent=fmt(deposit - v('posExpected')); }
-    else { $('p_posDelta').textContent='—'; }
+    $('p_posDelta').textContent = hasPos ? fmt(deposit - v('posExpected')) : '—';
   }
 
   ['amt100','amt50','amt20','amt10','amt5','amt1','billsSingle','coins','voids','posExpected','staff','date']
     .forEach(id=>$(id)?.addEventListener('input',compute));
   compute();
 
-  // 5) Print via hidden iframe
   function robustPrint(){
     try{
       const src=document.getElementById('printSummary').innerHTML;
@@ -300,56 +309,38 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{ -webkit-appe
   }
   $('btnPrint').addEventListener('click', robustPrint);
 
-  // Settings
   $('btnSettings').addEventListener('click',()=>{ document.getElementById('sheetSettings').style.display='flex'; });
   $('closeSettings').addEventListener('click',()=>{ document.getElementById('sheetSettings').style.display='none'; });
 
-  // Clear
   function clearAll(){
     ['amt100','amt50','amt20','amt10','amt5','amt1','billsSingle','coins','voids','posExpected'].forEach(id=>{ const el=$(id); if(el){ el.value=''; } });
     setToday();
     compute();
   }
   $('btnClear').addEventListener('click', clearAll);
+
+  const GH_KEY='mukja_github_cfg';
+  function getGhCfg(){ try{const o=JSON.parse(localStorage.getItem(GH_KEY)||'{}'); return Object.assign({owner:'',repo:'',path:'history/history.csv',branch:'main',token:''},o);}catch{return{owner:'',repo:'',path:'history/history.csv',branch:'main',token:''}} }
+  function setGhCfg(o){ localStorage.setItem(GH_KEY,JSON.stringify(o)); loadGhCfgUI(); }
+  function loadGhCfgUI(){ const cfg=getGhCfg(); ['ghOwner','ghRepo','ghPath','ghBranch','ghToken'].forEach(id=>{ if($(id)) $(id).value = cfg[id.replace('gh','').toLowerCase()] || cfg[id] || ''; }); $('ghPathPreview')&&($('ghPathPreview').textContent=cfg.path||'history/history.csv'); }
+  document.addEventListener('DOMContentLoaded', loadGhCfgUI);
+  $('saveGhCfg')?.addEventListener('click',()=>{ const cfg={ owner:$('ghOwner')?.value.trim()||'', repo:$('ghRepo')?.value.trim()||'', path:$('ghPath')?.value.trim()||'history/history.csv', branch:$('ghBranch')?.value.trim()||'main', token:$('ghToken')?.value.trim()||'' }; setGhCfg(cfg); toast('GitHub settings saved'); });
+
+  function toCSVRow(values){ return values.map(v=>{ if(v===null||v===undefined) return ''; const s=String(v); return (s.includes(',')||s.includes('"')||s.includes('\n')) ? ('"'+s.replace(/"/g,'""')+'"') : s; }).join(','); }
+  function todayISO(){ const d = new Date(); return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10); }
+  function collectRow(){ const header=['date','staff','$100s','$50s','$20s','$10s','$5s','$1s','bills_total','coins','other_cashouts','total_counted','net_after_cashouts','deposit','deposit_bills','deposit_coins','total_to_take_out','pos_expected_deposit','over_short']; const data={ date:$('date').value||todayISO(), staff:$('staff').value||'', amt100:v('amt100'),amt50:v('amt50'),amt20:v('amt20'),amt10:v('amt10'),amt5:v('amt5'),amt1:v('amt1'), bills:(document.getElementById('billsDenomBox').style.display!=='none')?(v('amt100')+v('amt50')+v('amt20')+v('amt10')+v('amt5')+v('amt1')):v('billsSingle'), coins:v('coins'), other:v('voids'), total:parseFloat(($('total').textContent||'').replace(/[^\d.-]/g,''))||0, net:parseFloat(($('net').textContent||'').replace(/[^\d.-]/g,''))||0, deposit:parseFloat(($('deposit').textContent||'').replace(/[^\d.-]/g,''))||0, depBills:parseFloat(($('depBills').textContent||'').replace(/[^\d.-]/g,''))||0, depCoins:parseFloat(($('depCoins').textContent||'').replace(/[^\d.-]/g,''))||0, totalOut:parseFloat(($('totalOut').textContent||'').replace(/[^\d.-]/g,''))||0, posExpected:v('posExpected'), posDelta:(function(){ const t=$('posDelta')?.textContent||''; const m=t.match(/-?\d+(\.\d+)?/g); if(m) return parseFloat(m[m.length-1]); return 0;})() }; const row=[data.date,data.staff,data.amt100,data.amt50,data.amt20,data.amt10,data.amt5,data.amt1,data.bills,data.coins,data.other,data.total,data.net,data.deposit,data.depBills,data.depCoins,data.totalOut,data.posExpected,data.posDelta]; return {header,row}; }
+  function downloadCSV(){ const {header,row}=collectRow(); const csv=toCSVRow(header)+'\n'+toCSVRow(row)+'\n'; const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a'); const date=(row[0]||todayISO()); const staff=(row[1]||'staff').replace(/\s+/g,'_'); a.download=`cashout_${date}_${staff}.csv`; a.href=URL.createObjectURL(blob); a.click(); URL.revokeObjectURL(a.href); toast('CSV downloaded'); }
+  $('btnSaveCSV').addEventListener('click',downloadCSV);
+
+  function b64encode(s){return btoa(unescape(encodeURIComponent(s)));}
+  function b64decode(b64){return decodeURIComponent(escape(atob(b64)));}
+  async function ghGet(o,r,p,b,t){const u=`https://api.github.com/repos/${o}/${r}/contents/${encodeURIComponent(p)}?ref=${encodeURIComponent(b)}`;return fetch(u,{headers:{'Authorization':`Bearer ${t}`,'Accept':'application/vnd.github+json'}})}
+  async function ghPut(o,r,p,b,content,message,sha,t){const u=`https://api.github.com/repos/${o}/${r}/contents/${encodeURIComponent(p)}`;const body={message,content:b64encode(content),branch:b};if(sha) body.sha=sha;return fetch(u,{method:'PUT',headers:{'Authorization':`Bearer ${t}`,'Accept':'application/vnd.github+json'},body:JSON.stringify(body)})}
+  async function saveToGitHub(){ const cfg=(function(){try{return JSON.parse(localStorage.getItem('mukja_github_cfg')||'{}')}catch{return{}}})(); const {owner='',repo='',path='history/history.csv',branch='main',token=''}=cfg; if(!owner||!repo||!path||!branch||!token){toast('Add GitHub settings in Settings');return;} const {header,row}=collectRow(); let content='', sha=null; let res=await ghGet(owner,repo,path,branch,token); if(res.status===200){const j=await res.json(); content=b64decode(j.content.replace(/\n/g,'')); sha=j.sha; if(!content.trim().length){content=toCSVRow(header)+'\n';} else if(!/^date,staff,/.test(content.split(/[\r\n]+/)[0])){content=toCSVRow(header)+'\n'+content.trim()+'\n';} else if(!content.endsWith('\n')){content+='\n';} content+=toCSVRow(row)+'\n'; } else if(res.status===404){ content=toCSVRow(header)+'\n'+toCSVRow(row)+'\n'; } else {toast('GitHub error (get): '+res.status); return;} const msg=`cashout: ${row[0]} by ${row[1]||'staff'}`; res=await ghPut(owner,repo,path,branch,content,msg,sha,token); if(res.status===201||res.status===200){toast('Saved to GitHub ✓');} else {toast('GitHub error (put): '+res.status);} }
+  $('btnSaveGitHub').addEventListener('click',()=>{ saveToGitHub().catch(()=>toast('GitHub network error')); });
+
+  try{ const saved=localStorage.getItem('mukja_staff'); if(saved&&$('staff')){$('staff').value=saved;} $('staff')?.addEventListener('change',()=>localStorage.setItem('mukja_staff',$('staff').value)); }catch(e){}
 })();
-
-  // Restore last staff on load; save on change
-  (function(){
-    try{
-      const saved = localStorage.getItem('mukja_staff');
-      if(saved && $('staff')){ $('staff').value = saved; }
-      $('staff')?.addEventListener('change', ()=>localStorage.setItem('mukja_staff',$('staff').value));
-    }catch(e){}
-  })();
-
-  // POS expected deposit normalization: allow cents without dot (11057 -> 110.57)
-  (function(){
-    const el = $('posExpected'); if(!el) return;
-    const normalize = () => {
-      const s = (el.value||'').trim();
-      if(!s) return;
-      if(/^\d+$/.test(s) && s.length > 2){
-        // treat as cents
-        const dollars = (parseInt(s,10)/100).toFixed(2);
-        el.value = dollars;
-      } else {
-        const f = parseFloat(s);
-        if(Number.isFinite(f)) el.value = (Math.round(f*100)/100).toFixed(2);
-      }
-      compute();
-    };
-    el.addEventListener('blur', normalize);
-    el.addEventListener('change', normalize);
-  })();
-
-  // Format Over/Short text as "OVER $X" or "SHORT $X"
-  function setPosDeltaText(delta){
-    const abs = Math.abs(Math.round(delta*100)/100);
-    const signText = delta < 0 ? 'SHORT ' : (delta > 0 ? 'OVER ' : '');
-    const formatted = new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(abs);
-    return signText ? (signText + formatted) : formatted;
-  }
-
 </script>
 </body>
 </html>
